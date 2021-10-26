@@ -1,0 +1,126 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Box{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+   
+
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Box</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('main.index') }}">Domov</a></li>
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profil</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('main.v_proizvodnji') }}">V proizvodnji</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.can(Permission.MODERATE) %}
+                <li><a href="{{ url_for('main.moderate') }}">Uredi komentarje</a></li>
+                {% endif %}
+                {% if current_user.is_administrator() %}
+                <li>
+                    <a href="{{ url_for('main.box_create') }}">Ustvari zaboj
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('main.messages') }}">Sporočila
+                    {% set new_messages = current_user.new_messages() %}
+                        <span id="message_count" class="badge" style="visibility: {% if new_messages %}visible{% else %}hidden {% endif %};">
+                            {{ new_messagges }}
+                        </span>
+                    </a>
+                </li>
+                {% endif %}  
+                {% if current_user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        
+                        Račun <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('auth.change_password') }}">Zamenjaj geslo</a></li>
+                        <li><a href="{{ url_for('auth.change_email_request') }}">Zamenjaj email</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">Izpis</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Vpis</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{{ moment.locale("sl") }}
+    <script>
+        function set_message_count(n) {
+            $('#message_count').text(n);
+            $('#message_count').css('visibility', n ? 'visible' : 'hidden');
+        }
+
+        {% if current_user.is_authenticated %}
+        $(function() {
+            var since = 0;
+            setInterval(function() {
+                $.ajax('{{ url_for('main.notifications') }}?since=' + since).done(
+                    function(notifications) {
+                        for (var i = 0; i < notifications.length; i++) {
+                            switch (notifications[i].name) {
+                                case 'unread_message_count':
+                                    set_message_count(notifications[i].data);
+                                    break;
+                                case 'task_progress':
+                                    set_task_progress(notifications[i].data.task_id,
+                                        notifications[i].data.progress);
+                                    break;
+                            }
+                            since = notifications[i].timestamp;
+                        }
+                    }
+                );
+            }, 10000);
+        });
+        {% endif %}
+    </script>
+{% endblock %}

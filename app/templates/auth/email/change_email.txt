@@ -1,0 +1,11 @@
+Spoštovani {{ user.username }},
+
+Za potrditev novega email naslova kliknite na naslednjo povezavo:
+
+{{ url_for('auth.change_email', token=token, _external=True) }}
+
+Lep pozdrav,
+
+Box administrator
+
+Obvestilo: To email sporočilo je bilo generirano avtomatsko, zato ne odgovarjajte nanj.

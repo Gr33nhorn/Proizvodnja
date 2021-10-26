@@ -1,0 +1,8 @@
+<p>Spoštovani {{ user.username }},</p>
+<p>Dobrodošli na <b>Box-u</b>!</p>
+<p>Za potrditev svojega računa <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">kliknite tukaj</a>.</p>
+<p>Lahko pa tudi prilepite naslednji url naslov v naslovno vrstico brskalnika::</p>
+<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
+<p>Lep pozdrav</p>
+<p>Box administrator</p>
+<p><small>Obvestilo: To email sporočilo je bilo generirano avtomatsko, zato ne odgovarjajte nanj</small></p>

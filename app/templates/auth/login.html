@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Box - Vpis{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Vpis</h1>
+</div>
+<div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+    <br>
+    <p>Pozabil/a geslo? <a href="{{ url_for('auth.password_reset_request') }}">Klikni sem za ponastavitev</a>.</p>
+    <p>Nov uporabnik? <a href="{{ url_for('auth.register') }}">Klikni sem za registracijo</a>.</p>
+</div>
+{% endblock %}

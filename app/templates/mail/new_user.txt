@@ -1,0 +1,1 @@
+Uporabnik {{ user.username }} se je pridružil.
